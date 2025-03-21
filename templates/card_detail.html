@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card bg-dark shadow">
+            {% if card.image_url %}
+            <img src="{{ card.image_url }}" class="card-img-top" alt="{{ card.name }}">
+            {% else %}
+            <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 300px;">
+                <span class="text-white">No Image</span>
+            </div>
+            {% endif %}
+            <div class="card-body">
+                <h2 class="card-title">{{ card.name }}</h2>
+                <div class="my-3">
+                    <span class="badge
+                    {% if card.rarity == 'Legendary' %}bg-warning text-dark
+                    {% elif card.rarity == 'Epic' %}bg-danger
+                    {% elif card.rarity == 'Rare' %}bg-primary
+                    {% elif card.rarity == 'Uncommon' %}bg-success
+                    {% else %}bg-secondary
+                    {% endif %} fs-6">{{ card.rarity }}</span>
+                    
+                    <span class="badge bg-info fs-6 ms-1">{{ card.element }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card bg-dark shadow mb-4">
+            <div class="card-header">
+                <h3>Stats</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="stat-box bg-primary bg-opacity-25 p-3 text-center rounded">
+                            <h4>Attack</h4>
+                            <span class="display-6">{{ card.attack }}</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="stat-box bg-success bg-opacity-25 p-3 text-center rounded">
+                            <h4>Defense</h4>
+                            <span class="display-6">{{ card.defense }}</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="stat-box bg-warning bg-opacity-25 p-3 text-center rounded">
+                            <h4>Speed</h4>
+                            <span class="display-6">{{ card.speed }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card bg-dark shadow">
+            <div class="card-header">
+                <h3>Skill: {{ card.skill }}</h3>
+            </div>
+            <div class="card-body">
+                <p class="card-text lead">{{ card.skill_description }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="my-4">
+    <a href="{{ url_for('cards') }}" class="btn btn-primary">
+        <i class="fas fa-arrow-left me-2"></i> Back to Cards
+    </a>
+</div>
+{% endblock %}

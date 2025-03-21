@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card bg-dark shadow">
+            <div class="card-header">
+                <h2>{{ player.username }}</h2>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <div class="display-1 mb-2">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <h3>Level {{ player.level }}</h3>
+                    <div class="progress mb-2">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ (player.xp / 100) }}%" 
+                            aria-valuenow="{{ player.xp }}" aria-valuemin="0" aria-valuemax="100">
+                            {{ player.xp }} XP
+                        </div>
+                    </div>
+                </div>
+                
+                <h4>Stats</h4>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item bg-dark text-white d-flex justify-content-between">
+                        <span>Gold:</span>
+                        <span><i class="fas fa-coins text-warning me-1"></i> {{ player.gold }}</span>
+                    </li>
+                    <li class="list-group-item bg-dark text-white d-flex justify-content-between">
+                        <span>Diamonds:</span>
+                        <span><i class="fas fa-gem text-info me-1"></i> {{ player.diamonds }}</span>
+                    </li>
+                    <li class="list-group-item bg-dark text-white d-flex justify-content-between">
+                        <span>PvE Record:</span>
+                        <span>{{ player.wins }}W - {{ player.losses }}L</span>
+                    </li>
+                    <li class="list-group-item bg-dark text-white d-flex justify-content-between">
+                        <span>PvP Record:</span>
+                        <span>{{ player.pvp_wins }}W - {{ player.pvp_losses }}L</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card bg-dark shadow mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3>Card Collection</h3>
+                <span class="badge bg-primary">{{ cards|length }} Cards</span>
+            </div>
+            <div class="card-body">
+                {% if cards %}
+                <div class="row">
+                    {% for user_card in cards %}
+                    <div class="col-md-6 col-lg-4 mb-3">
+                        <div class="card h-100 {% if user_card.equipped %}border border-warning{% endif %}">
+                            {% if user_card.card.image_url %}
+                            <img src="{{ user_card.card.image_url }}" class="card-img-top" alt="{{ user_card.card.name }}" style="height: 120px; object-fit: cover;">
+                            {% else %}
+                            <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 120px;">
+                                <span class="text-white">No Image</span>
+                            </div>
+                            {% endif %}
+                            <div class="card-body p-2">
+                                <h5 class="card-title">{{ user_card.card.name }}</h5>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="badge
+                                    {% if user_card.card.rarity == 'Legendary' %}bg-warning text-dark
+                                    {% elif user_card.card.rarity == 'Epic' %}bg-danger
+                                    {% elif user_card.card.rarity == 'Rare' %}bg-primary
+                                    {% elif user_card.card.rarity == 'Uncommon' %}bg-success
+                                    {% else %}bg-secondary
+                                    {% endif %}">{{ user_card.card.rarity }}</span>
+                                    
+                                    <span>Level {{ user_card.level }}</span>
+                                </div>
+                                
+                                <div class="mt-2 small">
+                                    <div class="d-flex justify-content-between">
+                                        <span>ATK: {{ user_card.card.attack }}</span>
+                                        <span>DEF: {{ user_card.card.defense }}</span>
+                                    </div>
+                                </div>
+                                
+                                {% if user_card.equipped %}
+                                <div class="mt-2 text-center">
+                                    <span class="badge bg-warning text-dark">Equipped</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="card-footer p-2">
+                                <a href="{{ url_for('card_detail', card_id=user_card.card.id) }}" class="btn btn-sm btn-primary w-100">View</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    This player doesn't have any cards yet.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="my-4">
+    <a href="{{ url_for('players') }}" class="btn btn-primary">
+        <i class="fas fa-arrow-left me-2"></i> Back to Players
+    </a>
+</div>
+{% endblock %}

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if title %}{{ title }} - {% endif %}Anime Card Game</title>
+    <!-- Bootstrap CSS - Replit Theme -->
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        main {
+            flex: 1;
+        }
+        
+        .navbar-brand img {
+            height: 30px;
+            margin-right: 10px;
+        }
+        
+        .bg-hero {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1578632767115-351597cf2477?ixlib=rb-4.0.3');
+            background-size: cover;
+            background-position: center;
+            color: white;
+        }
+        
+        .card {
+            transition: transform 0.2s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .footer {
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('home') }}">
+                <i class="fas fa-dragon text-warning"></i> 
+                Anime Card Game
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('home') }}">
+                            <i class="fas fa-home me-1"></i> Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('cards') }}">
+                            <i class="fas fa-cards me-1"></i> Cards
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('players') }}">
+                            <i class="fas fa-users me-1"></i> Players
+                        </a>
+                    </li>
+                </ul>
+                <div class="navbar-nav">
+                    <a class="nav-link" href="https://discord.gg/" target="_blank">
+                        <i class="fab fa-discord me-1"></i> Join Discord
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="py-4">
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer bg-dark text-white py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Anime Card Game</h5>
+                    <p>Collect cards, battle opponents, and become the ultimate champion!</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <h5>Connect With Us</h5>
+                    <div class="social-links">
+                        <a href="#" class="text-white me-2"><i class="fab fa-discord fa-lg"></i></a>
+                        <a href="#" class="text-white me-2"><i class="fab fa-twitter fa-lg"></i></a>
+                        <a href="#" class="text-white"><i class="fab fa-github fa-lg"></i></a>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div class="text-center">
+                <p class="mb-0">&copy; 2025 Anime Card Game. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="mb-4">Players Leaderboard</h1>
+
+<div class="card bg-dark shadow mb-4">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-dark table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Player</th>
+                        <th scope="col">Level</th>
+                        <th scope="col">XP</th>
+                        <th scope="col">Wins</th>
+                        <th scope="col">Losses</th>
+                        <th scope="col">PvP Wins</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for player in players %}
+                    <tr>
+                        <th scope="row">{{ loop.index }}</th>
+                        <td>{{ player.username }}</td>
+                        <td>{{ player.level }}</td>
+                        <td>{{ player.xp }}</td>
+                        <td>{{ player.wins }}</td>
+                        <td>{{ player.losses }}</td>
+                        <td>{{ player.pvp_wins }}</td>
+                        <td>
+                            <a href="{{ url_for('player_detail', player_id=player.id) }}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-user me-1"></i> View
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center">No players registered yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

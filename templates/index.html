@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card bg-dark text-white shadow-lg">
+            <div class="card-body text-center">
+                <h1 class="display-4 mb-4">Welcome to <span class="text-warning">Anime Card Battle</span></h1>
+                <p class="lead">
+                    An enhanced anime card collecting and battling game with PvP, PvE, evolution systems, and trading
+                </p>
+                <hr class="my-4">
+                <p>
+                    Join our Discord server to start collecting cards, building your deck, and battling other players!
+                </p>
+                <div class="mt-4">
+                    <a href="https://discord.gg/" class="btn btn-primary btn-lg" target="_blank">
+                        Join Discord
+                    </a>
+                    <a href="{{ url_for('cards') }}" class="btn btn-outline-light btn-lg ms-2">
+                        Browse Cards
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 bg-dark text-white shadow">
+            <div class="card-body text-center">
+                <h3 class="card-title text-primary">Collect</h3>
+                <p class="card-text">
+                    Collect hundreds of unique anime-themed cards with different rarities, elements, and abilities.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 bg-dark text-white shadow">
+            <div class="card-body text-center">
+                <h3 class="card-title text-success">Battle</h3>
+                <p class="card-text">
+                    Battle against AI enemies or challenge other players in PvP battles with your strongest cards.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 bg-dark text-white shadow">
+            <div class="card-body text-center">
+                <h3 class="card-title text-warning">Evolve</h3>
+                <p class="card-text">
+                    Level up your cards, evolve them to higher forms, and unlock powerful new abilities.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

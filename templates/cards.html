@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="mb-4">Card Collection</h1>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="input-group">
+            <input type="text" id="cardSearch" class="form-control" placeholder="Search cards...">
+            <button class="btn btn-outline-secondary" type="button">Search</button>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="btn-group float-md-end" role="group">
+            <button type="button" class="btn btn-outline-primary" data-filter="all">All</button>
+            <button type="button" class="btn btn-outline-warning" data-filter="Legendary">Legendary</button>
+            <button type="button" class="btn btn-outline-danger" data-filter="Epic">Epic</button>
+            <button type="button" class="btn btn-outline-info" data-filter="Rare">Rare</button>
+            <button type="button" class="btn btn-outline-success" data-filter="Uncommon">Uncommon</button>
+            <button type="button" class="btn btn-outline-secondary" data-filter="Common">Common</button>
+        </div>
+    </div>
+</div>
+
+<div class="row" id="cardGrid">
+    {% for card in cards %}
+    <div class="col-md-4 col-lg-3 mb-4 card-item" 
+         data-name="{{ card.name | lower }}" 
+         data-rarity="{{ card.rarity | lower }}">
+        <div class="card h-100">
+            {% if card.image_url %}
+            <img src="{{ card.image_url }}" class="card-img-top" alt="{{ card.name }}">
+            {% else %}
+            <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 200px;">
+                <span class="text-white">No Image</span>
+            </div>
+            {% endif %}
+            <div class="card-body">
+                <h5 class="card-title">{{ card.name }}</h5>
+                <p class="card-text">
+                    <span class="badge
+                    {% if card.rarity == 'Legendary' %}bg-warning text-dark
+                    {% elif card.rarity == 'Epic' %}bg-danger
+                    {% elif card.rarity == 'Rare' %}bg-primary
+                    {% elif card.rarity == 'Uncommon' %}bg-success
+                    {% else %}bg-secondary
+                    {% endif %}">{{ card.rarity }}</span>
+                    
+                    <span class="badge bg-info ms-1">{{ card.element }}</span>
+                </p>
+                <div class="d-flex justify-content-between small">
+                    <span>ATK: {{ card.attack }}</span>
+                    <span>DEF: {{ card.defense }}</span>
+                    <span>SPD: {{ card.speed }}</span>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="{{ url_for('card_detail', card_id=card.id) }}" class="btn btn-sm btn-primary w-100">View Details</a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12">
+        <div class="alert alert-info">
+            No cards available in the database yet.
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Card filtering
+    const filterButtons = document.querySelectorAll('[data-filter]');
+    const cardItems = document.querySelectorAll('.card-item');
+    const searchInput = document.getElementById('cardSearch');
+    
+    // Handle filter button clicks
+    filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const filterValue = this.getAttribute('data-filter').toLowerCase();
+            
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            
+            cardItems.forEach(card => {
+                if (filterValue === 'all' || card.getAttribute('data-rarity') === filterValue) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    });
+    
+    // Handle search input
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase().trim();
+        
+        cardItems.forEach(card => {
+            const cardName = card.getAttribute('data-name');
+            if (cardName.includes(searchTerm)) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
