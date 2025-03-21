@@ -1,14 +1,13 @@
-from app import db
+from flask_sqlalchemy import SQLAlchemy
 
-# These models reflect the SQLite models but for PostgreSQL usage
-# with the web interface/API
+# Create the database instance (moved from app.py)
+db = SQLAlchemy()
 
 class Player(db.Model):
     __tablename__ = 'api_players'
     id = db.Column(db.Integer, primary_key=True)
     discord_id = db.Column(db.BigInteger, unique=True, nullable=False)
     username = db.Column(db.String(128), nullable=False)
-    # Profile stats that mirror the Discord bot database
     gold = db.Column(db.Integer, default=1000)
     diamonds = db.Column(db.Integer, default=0)
     level = db.Column(db.Integer, default=1)
@@ -17,11 +16,10 @@ class Player(db.Model):
     losses = db.Column(db.Integer, default=0)
     pvp_wins = db.Column(db.Integer, default=0)
     pvp_losses = db.Column(db.Integer, default=0)
-    
+
     def __repr__(self):
         return f'<Player {self.username}>'
-    
-    # Convert to dictionary for API responses
+
     def to_dict(self):
         return {
             'id': self.id,
@@ -49,10 +47,10 @@ class Card(db.Model):
     skill = db.Column(db.String(100), nullable=False)
     skill_description = db.Column(db.Text, nullable=False)
     image_url = db.Column(db.String(255))
-    
+
     def __repr__(self):
         return f'<Card {self.name}>'
-    
+
     def to_dict(self):
         return {
             'id': self.id,
@@ -75,13 +73,13 @@ class UserCard(db.Model):
     level = db.Column(db.Integer, default=1)
     xp = db.Column(db.Integer, default=0)
     equipped = db.Column(db.Boolean, default=False)
-    
+
     player = db.relationship('Player', backref=db.backref('cards', lazy=True))
     card = db.relationship('Card')
-    
+
     def __repr__(self):
         return f'<UserCard {self.id}>'
-    
+
     def to_dict(self):
         return {
             'id': self.id,
