@@ -1,6 +1,6 @@
 import os
 import logging
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, request
 from models import db, Player, Card, UserCard  # Import db AFTER defining it in models.py
 
 # Configure logging
@@ -10,14 +10,19 @@ logger = logging.getLogger(__name__)
 # Initialize Flask app
 app = Flask(__name__)
 
-# Ensure the database directory exists
+# Ensure the database directory exists (only for SQLite)
 db_path = os.path.abspath("database/sparks.db")
-os.makedirs(os.path.dirname(db_path), exist_ok=True)
+if not os.path.exists(os.path.dirname(db_path)):
+    os.makedirs(os.path.dirname(db_path))
 
-# Flask-SQLAlchemy configuration
-app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
+# Set Database URI (SQLite for local, PostgreSQL for Railway)
+DATABASE_URL = os.environ.get("DATABASE_URL", f"sqlite:///{db_path}")
+if DATABASE_URL.startswith("postgres://"):  
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://")  # Fix for SQLAlchemy
+
+app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.secret_key = os.environ.get("SESSION_SECRET", "default-development-key")
+app.secret_key = os.environ.get("SESSION_SECRET", "default-secret-key")
 
 # Initialize database with Flask app
 db.init_app(app)
@@ -26,6 +31,11 @@ db.init_app(app)
 with app.app_context():
     db.create_all()
     logger.info("✅ Database tables created or verified.")
+
+# Log each request (For Railway debugging)
+@app.before_request
+def log_request():
+    logger.info(f"Incoming Request: {request.method} {request.path}")
 
 # API Routes
 @app.route('/api/status')
@@ -73,14 +83,17 @@ def players():
 # Error Handlers
 @app.errorhandler(404)
 def page_not_found(e):
+    logger.warning(f"404 Not Found: {request.path}")
     return render_template('404.html', title='Page Not Found'), 404
 
 @app.errorhandler(500)
 def server_error(e):
+    logger.error(f"500 Internal Server Error: {str(e)}")
     return render_template('500.html', title='Server Error'), 500
 
 # Run the app
 if __name__ == "__main__":
     from waitress import serve
-    logger.info("🚀 Starting server...")
-    serve(app, host="0.0.0.0", port=5000)
+    port = int(os.environ.get("PORT", 5000))  # Use Railway's assigned port
+    logger.info(f"🚀 Starting server on port {port}...")
+    serve(app, host="0.0.0.0", port=port)
