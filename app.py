@@ -10,15 +10,15 @@ logger = logging.getLogger(__name__)
 # Initialize Flask app
 app = Flask(__name__)
 
-# Ensure the database directory exists (only for SQLite)
-db_path = os.path.abspath("database/sparks.db")
-if not os.path.exists(os.path.dirname(db_path)):
-    os.makedirs(os.path.dirname(db_path))
+# Ensure DATABASE_URL is set (PostgreSQL for Railway)
+DATABASE_URL = os.environ.get("DATABASE_URL")
 
-# Set Database URI (SQLite for local, PostgreSQL for Railway)
-DATABASE_URL = os.environ.get("DATABASE_URL", f"sqlite:///{db_path}")
-if DATABASE_URL.startswith("postgres://"):  
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://")  # Fix for SQLAlchemy
+if not DATABASE_URL:
+    raise ValueError("❌ ERROR: DATABASE_URL is missing! Set it in Railway variables.")
+
+# Fix potential "postgres://" issue for SQLAlchemy
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://")
 
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
