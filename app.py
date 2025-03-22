@@ -10,14 +10,19 @@ logger = logging.getLogger(__name__)
 # 🔹 Initialize Flask App
 app = Flask(__name__)
 
-# 🔹 SQLite Database Configuration
-db_folder = "database"
-db_path = os.path.join(db_folder, "sparks.db")
-os.makedirs(db_folder, exist_ok=True)  # Ensure database folder exists
+# 🔹 Database Configuration (PostgreSQL for Railway, SQLite for Local)
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///database/sparks.db")
 
-app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
+if DATABASE_URL.startswith("postgres://"):  
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://")  # Fix for SQLAlchemy
+
+app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.secret_key = "your-secret-key"
+app.secret_key = os.getenv("SESSION_SECRET", "default-secret-key")
+
+# 🔹 Ensure Database Folder Exists (For SQLite)
+if "sqlite" in DATABASE_URL:
+    os.makedirs("database", exist_ok=True)
 
 # 🔹 Initialize Database
 db = SQLAlchemy(app)
