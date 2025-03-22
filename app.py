@@ -1,99 +1,75 @@
 import os
 import logging
 from flask import Flask, render_template, jsonify, request
-from models import db, Player, Card, UserCard  # Import db AFTER defining it in models.py
+from flask_sqlalchemy import SQLAlchemy
 
-# Configure logging
+# 🔹 Configure Logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Initialize Flask app
+# 🔹 Initialize Flask App
 app = Flask(__name__)
 
-# Ensure DATABASE_URL is set (PostgreSQL for Railway)
-DATABASE_URL = os.environ.get("DATABASE_URL")
+# 🔹 SQLite Database Configuration
+db_folder = "database"
+db_path = os.path.join(db_folder, "sparks.db")
+os.makedirs(db_folder, exist_ok=True)  # Ensure database folder exists
 
-if not DATABASE_URL:
-    raise ValueError("❌ ERROR: DATABASE_URL is missing! Set it in Railway variables.")
-
-# Fix potential "postgres://" issue for SQLAlchemy
-if DATABASE_URL.startswith("postgres://"):
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://")
-
-app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
+app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.secret_key = os.environ.get("SESSION_SECRET", "default-secret-key")
+app.secret_key = "your-secret-key"
 
-# Initialize database with Flask app
-db.init_app(app)
+# 🔹 Initialize Database
+db = SQLAlchemy(app)
 
-# Ensure database tables exist
 with app.app_context():
     db.create_all()
-    logger.info("✅ Database tables created or verified.")
+    logger.info("✅ Database initialized and tables created.")
 
-# Log each request (For Railway debugging)
+# 🔹 Request Logging (For Debugging)
 @app.before_request
 def log_request():
-    logger.info(f"Incoming Request: {request.method} {request.path}")
+    logger.info(f"📥 Incoming Request: {request.method} {request.path}")
 
-# API Routes
+# 🔹 API Routes
 @app.route('/api/status')
 def api_status():
     return jsonify({'status': 'ok', 'message': 'Anime Card Battle API is running!', 'version': '1.0.0'})
 
 @app.route('/api/cards')
 def api_cards():
+    from models import Card
     cards = Card.query.all()
     return jsonify([card.to_dict() for card in cards])
 
-@app.route('/api/cards/<int:card_id>')
-def api_card_detail(card_id):
-    card = Card.query.get_or_404(card_id)
-    return jsonify(card.to_dict())
-
 @app.route('/api/players')
 def api_players():
+    from models import Player
     players = Player.query.all()
     return jsonify([player.to_dict() for player in players])
 
-@app.route('/api/players/<int:player_id>')
-def api_player_detail(player_id):
-    player = Player.query.get_or_404(player_id)
-    cards = UserCard.query.filter_by(player_id=player_id).all()
-    return jsonify({'player': player.to_dict(), 'cards': [card.to_dict() for card in cards]})
-
-# Web Routes
+# 🔹 Web Routes
 @app.route('/')
 def home():
+    from models import Player, Card
     top_players = Player.query.order_by(Player.level.desc()).limit(5).all()
     rare_cards = Card.query.filter(Card.rarity.in_(['Legendary', 'Epic'])).limit(4).all()
-    return render_template('home.html', title='Anime Card Game - Home', top_players=top_players, rare_cards=rare_cards)
+    return render_template('home.html', title='Sparks - Home', top_players=top_players, rare_cards=rare_cards)
 
-@app.route('/cards')
-def cards():
-    all_cards = Card.query.all()
-    return render_template('cards.html', title='Card Collection', cards=all_cards)
-
-@app.route('/players')
-def players():
-    all_players = Player.query.all()
-    return render_template('players.html', title='Players', players=all_players)
-
-# Error Handlers
+# 🔹 Error Handlers
 @app.errorhandler(404)
 def page_not_found(e):
-    logger.warning(f"404 Not Found: {request.path}")
+    logger.warning(f"⚠️ 404 Not Found: {request.path}")
     return render_template('404.html', title='Page Not Found'), 404
 
 @app.errorhandler(500)
 def server_error(e):
-    logger.error(f"500 Internal Server Error: {str(e)}")
+    logger.error(f"🔥 500 Internal Server Error: {str(e)}")
     return render_template('500.html', title='Server Error'), 500
 
-# Run the app
+# 🔹 Run the App
 if __name__ == "__main__":
     from waitress import serve
-    port = int(os.environ.get("PORT", 5000))  # Use Railway's assigned port
+    port = int(os.getenv("PORT", 5000))
     logger.info(f"🚀 Starting server on port {port}...")
     serve(app, host="0.0.0.0", port=port)

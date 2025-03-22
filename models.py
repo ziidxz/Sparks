@@ -1,8 +1,9 @@
 from flask_sqlalchemy import SQLAlchemy
 
-# Create the database instance (moved from app.py)
+# Initialize the database
 db = SQLAlchemy()
 
+# 🔹 Player Model
 class Player(db.Model):
     __tablename__ = 'api_players'
     id = db.Column(db.Integer, primary_key=True)
@@ -35,6 +36,7 @@ class Player(db.Model):
             'pvp_losses': self.pvp_losses
         }
 
+# 🔹 Card Model
 class Card(db.Model):
     __tablename__ = 'api_cards'
     id = db.Column(db.Integer, primary_key=True)
@@ -65,6 +67,7 @@ class Card(db.Model):
             'image_url': self.image_url
         }
 
+# 🔹 UserCard Model (Player’s Cards)
 class UserCard(db.Model):
     __tablename__ = 'api_user_cards'
     id = db.Column(db.Integer, primary_key=True)
@@ -74,7 +77,8 @@ class UserCard(db.Model):
     xp = db.Column(db.Integer, default=0)
     equipped = db.Column(db.Boolean, default=False)
 
-    player = db.relationship('Player', backref=db.backref('cards', lazy=True))
+    # Relationships
+    player = db.relationship('Player', backref=db.backref('user_cards', lazy=True))
     card = db.relationship('Card')
 
     def __repr__(self):
@@ -85,8 +89,8 @@ class UserCard(db.Model):
             'id': self.id,
             'player_id': self.player_id,
             'card_id': self.card_id,
-            'card': self.card.to_dict() if self.card else None,
             'level': self.level,
             'xp': self.xp,
-            'equipped': self.equipped
+            'equipped': self.equipped,
+            'card': self.card.to_dict() if self.card else None
         }
